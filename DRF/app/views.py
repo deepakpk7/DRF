@@ -63,3 +63,62 @@ def fun3(req):
             return JsonResponse(s.data,status=status.HTTP_201_CREATED)
         else:
             return JsonResponse(s.errors)
+
+@api_view(['GET','PUT','DELETE'])
+def fun4(req,d):
+    try:
+        demo=Project_user.objects.get(pk=d)
+    except Project_user.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if req.method=='GET':
+        s=model_serializer(demo)
+        return Response(s.data)
+    elif req.method=='POUT':
+        s=model_serializer(demo,data=req.data)
+        if s.is_valid():
+            return Response(s.data)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+    elif req.method=='DELETE':
+        demo.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class fun5(APIView):
+    def get(self,req):
+        demo=Project_user.objects.all()
+        s=model_serializer(demo,many=True)
+        return Response(s.data)
+    def post(self,req):
+        s=model_serializer(data=req.data)
+        if s.is_valid():
+            s.save()
+            return JsonResponse(s.data,status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse(s.errors,status=status.HTTP_400_BAD_REQUEST)
+        
+class fun6(APIView):
+    def get(self,req,d):
+        try:
+            demo=Project_user.objects.get(pk=d)
+            s=model_serializer(demo)
+            return Response(s.data)
+        except Project_user.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    def put(self,req,d):
+        try:
+            demo=Project_user.objects.get(pk=d)
+            s=model_serializer(demo,data=req.data)
+            if s.is_valid():
+                return Response(s.data)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Project_user.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    def delete(self,req,d):
+        try:
+            demo=Project_user.get(pk=d)
+            demo.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Project_user.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
